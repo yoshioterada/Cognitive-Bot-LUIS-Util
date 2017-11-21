@@ -5,7 +5,6 @@
  */
 package com.yoshio3.services;
 
-import java.util.Optional;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -25,9 +24,10 @@ public class TranslatorTextServicesTest {
         String translatedEnglish = "これはペンです。";
 
         TranslatorTextServices instance = new TranslatorTextServices();
-        Optional<String> accessTokenForTranslator = instance.getAccessTokenForTranslator();
-        String token = accessTokenForTranslator.orElseGet(() -> "");
-        String result = instance.translateEnglish(englishText, token);
+        String result = instance.translateEnglishToJapanese(englishText);
         assertEquals(translatedEnglish, result);
+        
+        String langList = instance.getLangList();
+        assertEquals(",af,ar,bn,bs-Latn,bg,ca,zh-CHS,zh-CHT,yue,hr,cs,da,nl,en,et,fj,fil,fi,fr,de,el,ht,he,hi,mww,hu,id,it,ja,sw,tlh,tlh-Qaak,ko,lv,lt,mg,ms,mt,yua,no,otq,fa,pl,pt,ro,ru,sm,sr-Cyrl,sr-Latn,sk,sl,es,sv,ty,ta,th,to,tr,uk,ur,vi,cy,", langList);
     }
 }
