@@ -1,7 +1,17 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2017 Yoshio Terada
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.yoshio3.services;
 
@@ -50,8 +60,6 @@ public class EmotionDetectorService implements Serializable {
             Future<Response> responseForEmotion = getEmotionalInfo(fileURL);
             Response emotionRes = responseForEmotion.get();
             return jobForEmotion(emotionRes);
-//            System.out.println(emotionRes.readEntity(String.class));
-            //[
             //{"faceRectangle":{"height":133,"left":326,"top":147,"width":133},
             //  "scores":{"anger":6.25079047E-05,"contempt":0.0006554612,"disgust":0.0001575452,"fear":1.02432514E-05,"happiness":4.513315E-05,"neutral":0.9630757,"sadness":0.0349147841,"surprise":0.00107860123}}]
         } catch (InterruptedException | ExecutionException | UnsupportedEncodingException e) {
@@ -94,7 +102,7 @@ public class EmotionDetectorService implements Serializable {
     /*
     REST 呼び出し成功か否かの判定
      */
-    protected boolean checkRequestSuccess(Response response) {
+    private boolean checkRequestSuccess(Response response) {
         Response.StatusType statusInfo = response.getStatusInfo();
         Response.Status.Family family = statusInfo.getFamily();
         return family != null && family == Response.Status.Family.SUCCESSFUL;
