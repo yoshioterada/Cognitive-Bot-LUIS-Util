@@ -1,13 +1,11 @@
 package com.yoshio3.services;
 
 import com.yoshio3.services.util.PropertyReaderService;
-import java.util.Optional;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.glassfish.jersey.jackson.JacksonFeature;
 
 /**
  * Translate English document to Japanese documents by using Microsoft
@@ -21,29 +19,17 @@ public class TranslatorTextServices {
     private final static String AUTH_URL = "https://api.cognitive.microsoft.com/sts/v1.0/issueToken";
     private final static String TRANSLATOR_URL = "https://api.microsofttranslator.com/v2/http.svc/Translate";
     private final static String LANG_LIST = "https://api.microsofttranslator.com/v2/http.svc/GetLanguagesForTranslate";
-
+    private final static String AUTH_ERROR_MESSAGE = "認証に失敗しました。アクセス・トークンが正しいか調べてください";
     private final static String ERROR_MESSAGE = "正しく翻訳ができませんでした。";
     private final static String SUBSCRIPTION_KEY;
+    private final String accessToken;
 
     static {
         SUBSCRIPTION_KEY = PropertyReaderService.getPropertyValue("TRANSLATOR_SUBSCRIPTION_KEY");
     }
 
-    /**
-     * Get Access Token from Auth Server.
-     *
-     * The detail information to get the Auth Token is as follows.
-     * http://docs.microsofttranslator.com/oauth-token.html
-     *
-     * Retrieve your authentication key from the Azure Admin screen. For example
-     * accessKey look like following digit value
-     * "a2436*********************9bc7e"
-     *
-     * @return {@code Optional<String>} if
-     */
-    public Optional<String> getAccessTokenForTranslator() {
+    public TranslatorTextServices() {
         Client client = ClientBuilder.newBuilder()
-                .register(JacksonFeature.class)
                 .build();
         Entity<String> entity = Entity.entity("", MediaType.TEXT_PLAIN_TYPE);
         Response response = client.target(AUTH_URL)
@@ -51,9 +37,9 @@ public class TranslatorTextServices {
                 .header(OCP_APIM_SUBSCRIPTION_KEY, SUBSCRIPTION_KEY)
                 .post(entity);
         if (isRequestSuccess(response)) {
-            return Optional.of(response.readEntity(String.class));
+            this.accessToken = response.readEntity(String.class);
         } else {
-            return Optional.empty();
+            this.accessToken = null;
         }
     }
 
@@ -65,17 +51,20 @@ public class TranslatorTextServices {
      *
      *
      * @param englishText The text value which you would like to translate.
-     * @param accessToken The Key value for authentication
      *
      * @return {@code String} Translated Japanese String
      */
-    public String translateEnglish(String englishText, String accessToken) {
-        Client client = ClientBuilder.newBuilder()
-                .register(JacksonFeature.class)
-                .build();
+    public String translateEnglishToJapanese(String englishText) {
+        if (accessToken == null) {
+            return AUTH_ERROR_MESSAGE;
+        }
+        StringBuilder builder = new StringBuilder();
 
+        Client client = ClientBuilder.newBuilder()
+                .build();
         Response response = client.target(TRANSLATOR_URL)
                 .queryParam("text", englishText)
+                .queryParam("from", "en")
                 .queryParam("to", "ja")
                 .queryParam("contentType", MediaType.TEXT_PLAIN)
                 .request()
@@ -86,17 +75,16 @@ public class TranslatorTextServices {
             String readEntity = response.readEntity(String.class);
             readEntity = readEntity.replaceAll("</?" + "string" + "/?>", "");
             readEntity = readEntity.replaceAll("<" + "string" + " [^>]*>", "");
-
-//            ResponseFromTranslateText unmarshal = JAXB.unmarshal(new StringReader(readEntity), ResponseFromTranslateText.class);
-            return readEntity;
+            builder.append(readEntity);
         } else {
-            return ERROR_MESSAGE;
+            builder.append(ERROR_MESSAGE);
         }
+
+        return builder.toString();
     }
 
-    public String getLangList(String accessToken) {
+    public String getLangList() {
         Client client = ClientBuilder.newBuilder()
-                .register(JacksonFeature.class)
                 .build();
 
         Response response = client.target(LANG_LIST)
@@ -106,7 +94,12 @@ public class TranslatorTextServices {
                 .header("Authorization", "Bearer " + accessToken)
                 .get();
         if (isRequestSuccess(response)) {
-            return response.readEntity(String.class);
+            String readEntity = response.readEntity(String.class);
+            readEntity = readEntity.replaceAll("</?" + "ArrayOfstring" + "/?>", "");
+            readEntity = readEntity.replaceAll("<" + "ArrayOfstring" + " [^>]*>", "");
+            readEntity = readEntity.replaceAll("</?" + "string" + "/?>", ",");
+            readEntity = readEntity.replaceAll(",,", ",");
+            return readEntity;
         } else {
             return ERROR_MESSAGE;
         }
