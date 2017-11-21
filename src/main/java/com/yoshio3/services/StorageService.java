@@ -110,7 +110,6 @@ public class StorageService{
     private BlobStorageEntity convertEntity(CloudBlob blob) {
         BlobStorageEntity entity = new BlobStorageEntity();
         try {
-
             BlobProperties properties = blob.getProperties();
 
             entity.setLastModifyDate(properties.getLastModified());
