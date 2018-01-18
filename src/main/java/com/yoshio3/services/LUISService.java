@@ -24,7 +24,6 @@
  */
 package com.yoshio3.services;
 
-
 import com.yoshio3.services.util.PropertyReaderService;
 import com.yoshio3.services.util.BasicRESTService;
 import com.yoshio3.rest.entities.luis.ResponseFromLUIS;
@@ -33,6 +32,9 @@ import java.net.URLEncoder;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -51,16 +53,16 @@ public class LUISService extends BasicRESTService {
     static {
         LUIS_SERVER_URL = PropertyReaderService.getPropertyValue("LUIS_SERVER_URL");
     }
-    
-    public Optional<ResponseFromLUIS> getResponseFromLUIS(String inputString){
-        LOGGER.log(Level.FINE, "invokeLUIS query: {0}", inputString);
+
+    public Optional<ResponseFromLUIS> getResponseFromLUIS(String inputString) {
+        LOGGER.log(Level.INFO, "invokeLUIS query: {0}", inputString);
         try {
             inputString = URLEncoder.encode(inputString, "UTF-8");
         } catch (UnsupportedEncodingException ex) {
             LOGGER.log(Level.SEVERE, "UTF-8 is not supported", ex);
         }
         String url = LUIS_SERVER_URL + inputString;
-        LOGGER.log(Level.FINE, "Request URL for LUIS : {0}", url);
+        LOGGER.log(Level.INFO, "Request URL for LUIS : {0}", url);
 
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target(url);
@@ -68,12 +70,40 @@ public class LUISService extends BasicRESTService {
                 .request(MediaType.WILDCARD)
                 .get();
 
+        LOGGER.log(Level.FINE, "Response Status : {0}", response.getStatus());
+        LOGGER.log(Level.FINE, "Response Family : {0}", response.getStatusInfo().getFamily().toString());
+
+        JsonbConfig nillableConfig = new JsonbConfig()
+                .withNullValues(true);
+        Jsonb jsonb = JsonbBuilder.create(nillableConfig);
         if (isRequestSuccess(response)) {
-            ResponseFromLUIS luis = response.readEntity(ResponseFromLUIS.class);
-            return Optional.of(luis);
-        }else{
+            String jsonEntity = response.readEntity(String.class);
+            LOGGER.log(Level.INFO, "Debug : \n {0}", jsonEntity);
+            try {
+                ResponseFromLUIS luis = jsonb.fromJson(jsonEntity, ResponseFromLUIS.class);
+                System.out.println(luis);
+                return Optional.of(luis);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+//            LOGGER.log(Level.INFO, "Debug : {0}", luis.toString());
+
+        } else {
             handleIllegalState(response);
-            return Optional.empty();            
+            LOGGER.log(Level.SEVERE, "Error : {0}", response.readEntity(String.class));
+            return Optional.empty();
         }
+            return Optional.empty();        
     }
 }
+
+/*
+
+
+        EmotionResponseJSONBody[] persons;
+        if (checkRequestSuccess(emotionRes)) {
+            persons = jsonb.fromJson(emotionRes.readEntity(String.class), EmotionResponseJSONBody[].class);
+        } else {
+            return emotionRes.readEntity(String.class);
+        }
+*/

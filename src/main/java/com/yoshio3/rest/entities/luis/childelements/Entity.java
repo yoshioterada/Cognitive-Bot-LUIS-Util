@@ -24,22 +24,16 @@
  */
 package com.yoshio3.rest.entities.luis.childelements;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  *
  * @author Yoshio Terada
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Entity {
 
     private String entity;
     private String type;
-    private Long startIndex;
-    private Long endIntex;
+    private Float startIndex;
+    private Float endIntex;
     private String score;
 
     /**
@@ -73,28 +67,28 @@ public class Entity {
     /**
      * @return the startIndex
      */
-    public Long getStartIndex() {
+    public Float getStartIndex() {
         return startIndex;
     }
 
     /**
      * @param startIndex the startIndex to set
      */
-    public void setStartIndex(Long startIndex) {
+    public void setStartIndex(Float startIndex) {
         this.startIndex = startIndex;
     }
 
     /**
      * @return the endIntex
      */
-    public Long getEndIntex() {
+    public Float getEndIntex() {
         return endIntex;
     }
 
     /**
      * @param endIntex the endIntex to set
      */
-    public void setEndIntex(Long endIntex) {
+    public void setEndIntex(Float endIntex) {
         this.endIntex = endIntex;
     }
 

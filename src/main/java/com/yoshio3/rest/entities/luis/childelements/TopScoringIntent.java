@@ -24,20 +24,14 @@
  */
 package com.yoshio3.rest.entities.luis.childelements;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  *
  * @author Yoshio Terada
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class TopScoringIntent {
 
     private String intent;
-    private Long score;
+    private Float score;
 
     /**
      * @return the intent
@@ -56,14 +50,14 @@ public class TopScoringIntent {
     /**
      * @return the score
      */
-    public Long getScore() {
+    public Float getScore() {
         return score;
     }
 
     /**
      * @param score the score to set
      */
-    public void setScore(Long score) {
+    public void setScore(Float score) {
         this.score = score;
     }
 

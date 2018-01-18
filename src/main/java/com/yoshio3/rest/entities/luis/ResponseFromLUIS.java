@@ -27,22 +27,18 @@ package com.yoshio3.rest.entities.luis;
 import com.yoshio3.rest.entities.luis.childelements.TopScoringIntent;
 import com.yoshio3.rest.entities.luis.childelements.Intent;
 import com.yoshio3.rest.entities.luis.childelements.Entity;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 /**
  *
  * @author Yoshio Terada
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class ResponseFromLUIS{
 
 private String query;
 private TopScoringIntent topScoringIntent;
-private Intent[] intents;
-private Entity[] entities;
+private List<Intent> intents;
+private List<Entity> entities;
 
     /**
      * @return the query
@@ -72,39 +68,37 @@ private Entity[] entities;
         this.topScoringIntent = topScoringIntent;
     }
 
+
     /**
      * @return the intents
      */
-    public Intent[] getIntents() {
+    public List<Intent> getIntents() {
         return intents;
     }
 
     /**
      * @param intents the intents to set
      */
-    public void setIntents(Intent[] intents) {
+    public void setIntents(List<Intent> intents) {
         this.intents = intents;
     }
 
     /**
      * @return the entities
      */
-    public Entity[] getEntities() {
+    public List<Entity> getEntities() {
         return entities;
     }
 
     /**
      * @param entities the entities to set
      */
-    public void setEntities(Entity[] entities) {
+    public void setEntities(List<Entity> entities) {
         this.entities = entities;
     }
 
     @Override
     public String toString() {
-        return "ResponseFromLUIS{" + "query=" + query + ", topScoringIntent=" + topScoringIntent + ", intents=" + intents + ", entities=" + entities + '}';
+        return "ResponseFromLUIS{" + "query=" + query + ", topScoringIntent=" + topScoringIntent + ", intents=" + getIntents() + ", entities=" + getEntities() + '}';
     }
-
-
-
 } 

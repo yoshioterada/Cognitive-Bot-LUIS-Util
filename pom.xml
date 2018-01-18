@@ -4,7 +4,7 @@
 
     <groupId>com.yoshio3</groupId>
     <artifactId>Bot-Luis-Translator-Util</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
     <packaging>jar</packaging>
 
     <name>Bot-Luis-Translator-Util</name>
